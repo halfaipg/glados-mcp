@@ -61,11 +61,18 @@ Add this to your MCP client configuration:
     "glados-mcp": {
       "command": "./glados-mcp/venv/bin/python",
       "args": ["-m", "tts.server"],
-      "cwd": "./glados-mcp"
+      "cwd": "./glados-mcp",
+      "env": {
+        "PYTHONPATH": "./glados-mcp",
+        "MCP_DEBUG": "1",
+        "MCP_LOG_LEVEL": "DEBUG"
+      }
     }
   }
 }
 ```
+
+**Note:** Make sure the paths match your actual installation directory. If you installed in a different location, adjust the `command` and `cwd` paths accordingly.
 
 ## Usage
 
