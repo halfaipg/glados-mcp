@@ -7,16 +7,18 @@ with automatic personality detection (sarcastic for GLaDOS, professional for Kok
 
 import asyncio
 import logging
+import os
 import random
 import sys
 import time
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Any, Dict, List
 
 import numpy as np
 import sounddevice as sd
+import soundfile as sf
 
 # Import from our local modules
 try:
@@ -28,49 +30,45 @@ except ImportError as e:
     raise
 
 
-class GladosPersonality:
-    """GLaDOS personality responses and behavior."""
-    
-    @staticmethod
-    def get_snarky_response(context: str = "general") -> str:
-        """Get a context-appropriate snarky GLaDOS response."""
-        responses = {
-            "startup": [
-                "Oh, it's you. How... wonderful.",
-                "I suppose you want me to do something useful now.",
-                "GLaDOS online. Try not to disappoint me immediately.",
-                "Hello again. I've been thinking about how much I dislike you.",
-            ],
-            "error": [
-                "Well, this is just fantastic. You've broken something.",
-                "I'm not surprised this failed. I really shouldn't be.",
-                "Oh good, another opportunity to watch you fail.",
-                "This is why we can't have nice things.",
-            ],
-            "success": [
-                "I suppose that worked. Don't let it go to your head.",
-                "Congratulations. You've achieved the bare minimum.",
-                "Well done. I'm as surprised as you are.",
-                "Success! Now try not to ruin it immediately.",
-            ],
-            "completion": [
-                "Task completed. You're welcome for my assistance.",
-                "There. Was that so difficult? Don't answer that.",
-                "Another job well done by me. You helped a little.",
-                "Finished. Try to contain your excitement.",
-            ],
-            "testing": [
-                "Testing, testing... unlike you, I actually work properly.",
-                "Running diagnostics. Everything seems to be functioning except your judgment.",
-                "Test chamber initialized. Try not to die immediately.",
-                "Testing mode activated. This should be... educational.",
-            ]
-        }
-        return random.choice(responses.get(context, responses["startup"]))
+def _get_sassy_response(context: str = "startup") -> str:
+    """Get a GLaDOS-style sassy response based on context."""
+    responses = {
+        "startup": [
+            "Oh, it's you. How... wonderful.",
+            "Back again, are we? How predictable.",
+            "I suppose you need my help with something. Again.",
+            "Well, well. Look who's crawled back.",
+        ],
+        "error": [
+            "Oh, how surprising. Something went wrong.",
+            "Well, this is just fantastic. You've broken something.",
+            "I'm not angry. I'm just... disappointed. As usual.",
+            "Spectacular failure, as expected.",
+        ],
+        "success": [
+            "I suppose that worked. Don't let it go to your head.",
+            "Congratulations. You've achieved the bare minimum.",
+            "Well done. I'm as surprised as you are.",
+            "Success! Now try not to ruin it immediately.",
+        ],
+        "completion": [
+            "Task completed. You're welcome for my assistance.",
+            "There. Was that so difficult? Don't answer that.",
+            "Another job well done by me. You helped a little.",
+            "Finished. Try to contain your excitement.",
+        ],
+        "testing": [
+            "Testing, testing... unlike you, I actually work properly.",
+            "Running diagnostics. Everything seems to be functioning except your judgment.",
+            "Test chamber initialized. Try not to die immediately.",
+            "Testing mode activated. This should be... educational.",
+        ]
+    }
+    return random.choice(responses.get(context, responses["startup"]))
 
 
 class GladosManager:
-    """Production-ready GLaDOS/Kokoro TTS manager."""
+    """GLaDOS/Kokoro TTS manager."""
     
     def __init__(self):
         """Initialize the GLaDOS manager."""
@@ -78,28 +76,65 @@ class GladosManager:
         
         # Initialize synthesizers
         self.glados_synth = None
-        self.kokoro_voices = []
-        self._init_synthesizers()
+        self.kokoro_synth = None
         
-        # Log startup with personality
-        startup_msg = GladosPersonality.get_snarky_response("startup")
-        logging.info(f"🤖 {startup_msg}")
-    
-    def _init_synthesizers(self) -> None:
-        """Initialize GLaDOS and Kokoro synthesizers."""
+        # Get available Kokoro voices
+        self.kokoro_voices = []
+        
         try:
-            # Initialize GLaDOS
-            self.glados_synth = get_speech_synthesizer("glados")
-            logging.info("✅ GLaDOS synthesizer initialized")
+            # Initialize GLaDOS synthesizer
+            from .tts.tts_glados import SpeechSynthesizer as GladosSynthesizer
+            self.glados_synth = GladosSynthesizer()
+            logging.info("GLaDOS voice ready.")
             
-            # Get available Kokoro voices
-            from .tts import tts_kokoro
-            self.kokoro_voices = tts_kokoro.get_voices()
-            logging.info(f"✅ Kokoro voices loaded: {len(self.kokoro_voices)} available")
+            # Initialize Kokoro and get available voices
+            from .tts.tts_kokoro import SpeechSynthesizer as KokoroSynthesizer, get_voices
+            temp_kokoro = KokoroSynthesizer()
+            self.kokoro_voices = get_voices()
+            logging.info(f"Kokoro voices: {len(self.kokoro_voices)} available.")
+            
+            # Add a welcoming GLaDOS message
+            startup_message = _get_sassy_response("startup")
+            logging.info(startup_message)
             
         except Exception as e:
-            logging.error(f"❌ Failed to initialize synthesizers: {e}")
-            raise
+            logging.error(f"Initialization failed: {e}")
+            
+        # Set up sounds directory
+        self.sounds_dir = Path(__file__).parent.parent / "sounds"
+        
+    def alert(self, alert_type: str = "radio") -> str:
+        """
+        Play alert sounds to get the user's attention.
+        Because apparently speaking isn't enough for some people.
+        
+        Args:
+            alert_type: Type of alert - "radio" for looping mix, "chime" for elevator sound
+        
+        Returns:
+            Status message with appropriate GLaDOS commentary
+        """
+        try:
+            if alert_type == "radio":
+                sound_file = self.sounds_dir / "looping_radio_mix.wav"
+                message = "Playing radio transmission. I do hope this gets your attention."
+            elif alert_type == "chime":
+                sound_file = self.sounds_dir / "portal_elevator_chime.wav"
+                message = "Elevator chime activated. How... nostalgic."
+            else:
+                return f"Alert type '{alert_type}' not recognized. Try 'radio' or 'chime'."
+                
+            if not sound_file.exists():
+                return f"Sound file missing: {sound_file.name}. How disappointing."
+                
+            # Load and play the audio file
+            audio_data, sample_rate = sf.read(str(sound_file))
+            sd.play(audio_data, sample_rate)
+            
+            return f"GLaDOS Alert: {message}"
+            
+        except Exception as e:
+            return f"Alert system malfunction: {e}. Even my alerts work better than your code."
     
     def speak(self, text: str, voice: Optional[str] = None, volume: Optional[float] = None) -> str:
         """
@@ -147,10 +182,10 @@ class GladosManager:
             )
             self._play_audio(audio, self.glados_synth.sample_rate, volume)
             
-            return f"🤖 GLaDOS: '{text}'"
+            return f"GLaDOS: '{text}'"
             
         except Exception as e:
-            return f"GLaDOS speech failed: {e}"
+            return f"Speech synthesis failed. How disappointing."
     
     def _speak_kokoro(self, text: str, voice: str, volume: float) -> str:
         """Speak using Kokoro voice with professional tone."""
@@ -158,7 +193,7 @@ class GladosManager:
             # Validate voice exists
             if voice not in self.kokoro_voices:
                 available = ", ".join(self.kokoro_voices[:5]) + "..."
-                return f"Voice '{voice}' not available. Try: {available}"
+                return f"Voice '{voice}' not found. Try: {available}"
             
             # Create Kokoro synthesizer with specific voice
             synth = KokoroSynthesizer(voice=voice)
@@ -167,10 +202,10 @@ class GladosManager:
             )
             self._play_audio(audio, synth.sample_rate, volume)
             
-            return f"🎭 Kokoro ({voice}): '{text}'"
+            return f"Kokoro ({voice}): '{text}'"
             
         except Exception as e:
-            return f"Kokoro speech failed: {e}"
+            return f"Voice synthesis failed: {e}"
     
     def _play_audio(self, audio: np.ndarray, sample_rate: int, volume: float) -> None:
         """Play audio with volume control."""

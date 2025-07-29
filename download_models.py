@@ -3,7 +3,7 @@
 GLaDOS MCP Server - Model Download Script
 
 Downloads the required TTS models for GLaDOS and Kokoro voices.
-Based on the original GLaDOS repo approach but simplified for TTS only.
+Uses the exact same URLs and checksums as the original GLaDOS repository.
 """
 
 import os
@@ -12,28 +12,40 @@ import urllib.request
 import hashlib
 from pathlib import Path
 
-# Model URLs and checksums
+# Model URLs from original GLaDOS GitHub releases
 MODELS = {
     "glados.onnx": {
-        "url": "https://github.com/dnhkng/GLaDOS/raw/main/models/TTS/glados.onnx",
+        "url": "https://github.com/dnhkng/GLaDOS/releases/download/0.1/glados.onnx",
+        "checksum": "17ea16dd18e1bac343090b8589042b4052f1e5456d42cad8842a4f110de25095",
         "size": "63MB"
     },
     "kokoro-v1.0.fp16.onnx": {
-        "url": "https://huggingface.co/remsky/Kokoro-TTS/resolve/main/kokoro-v1.0.fp16.onnx", 
-        "size": "169MB"
+        "url": "https://github.com/dnhkng/GLaDOS/releases/download/0.1/kokoro-v1.0.fp16.onnx",
+        "checksum": "c1610a859f3bdea01107e73e50100685af38fff88f5cd8e5c56df109ec880204",
+        "size": "163MB"
     },
     "kokoro-voices-v1.0.bin": {
-        "url": "https://huggingface.co/remsky/Kokoro-TTS/resolve/main/kokoro-voices-v1.0.bin",
-        "size": "13MB"  
+        "url": "https://github.com/dnhkng/GLaDOS/releases/download/0.1/kokoro-voices-v1.0.bin",
+        "checksum": "c5adf5cc911e03b76fa5025c1c225b141310d0c4a721d6ed6e96e73309d0fd88",
+        "size": "13MB"
     },
     "phomenizer_en.onnx": {
-        "url": "https://github.com/dnhkng/GLaDOS/raw/main/models/TTS/phomenizer_en.onnx",
-        "size": "58MB"
+        "url": "https://github.com/dnhkng/GLaDOS/releases/download/0.1/phomenizer_en.onnx",
+        "checksum": "b64dbbeca8b350927a0b6ca5c4642e0230173034abd0b5bb72c07680d700c5a0",
+        "size": "59MB"
     }
 }
 
-def download_file(url: str, filepath: Path, description: str):
-    """Download a file with progress indication."""
+def verify_checksum(filepath: Path, expected_checksum: str) -> bool:
+    """Verify SHA256 checksum of downloaded file."""
+    sha256_hash = hashlib.sha256()
+    with open(filepath, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            sha256_hash.update(chunk)
+    return sha256_hash.hexdigest() == expected_checksum
+
+def download_file(url: str, filepath: Path, description: str, expected_checksum: str):
+    """Download a file with progress indication and checksum verification."""
     print(f"Downloading {description}...")
     
     def progress_hook(block_num, block_size, total_size):
@@ -44,14 +56,22 @@ def download_file(url: str, filepath: Path, description: str):
     
     try:
         urllib.request.urlretrieve(url, filepath, progress_hook)
-        print(f"\n  ✅ Downloaded {description}")
-        return True
+        print(f"\n  Verifying checksum...")
+        
+        if verify_checksum(filepath, expected_checksum):
+            print(f"  ✅ Downloaded and verified {description}")
+            return True
+        else:
+            print(f"  ❌ Checksum verification failed for {description}")
+            filepath.unlink()  # Delete corrupted file
+            return False
+            
     except Exception as e:
         print(f"\n  ❌ Failed to download {description}: {e}")
         return False
 
 def main():
-    """Download all required TTS models."""
+    """Download all required TTS models with checksum verification."""
     print("🤖 GLaDOS MCP Server - Model Download")
     print("=====================================")
     
@@ -66,14 +86,19 @@ def main():
     for filename, info in MODELS.items():
         filepath = models_dir / filename
         
-        # Skip if already exists
+        # Skip if already exists and checksum is correct
         if filepath.exists():
-            print(f"⏭️  {filename} already exists, skipping...")
-            success_count += 1
-            continue
-            
+            print(f"⏭️  {filename} exists, verifying checksum...")
+            if verify_checksum(filepath, info["checksum"]):
+                print(f"  ✅ {filename} verified, skipping download")
+                success_count += 1
+                continue
+            else:
+                print(f"  ⚠️  {filename} checksum failed, re-downloading...")
+                filepath.unlink()
+        
         # Download the model
-        if download_file(info["url"], filepath, f"{filename} ({info['size']})"):
+        if download_file(info["url"], filepath, f"{filename} ({info['size']})", info["checksum"]):
             success_count += 1
     
     # Summary
@@ -81,7 +106,7 @@ def main():
     print(f"   Successfully downloaded: {success_count}/{len(MODELS)} models")
     
     if success_count == len(MODELS):
-        print("🎉 All models downloaded! Ready to run GLaDOS MCP Server.")
+        print("🎉 All models downloaded and verified! Ready to run GLaDOS MCP Server.")
         print("\nNext steps:")
         print("   cd glados-mcp")
         print("   python -m venv venv")
@@ -89,7 +114,6 @@ def main():
         print("   pip install -e .")
     else:
         print("⚠️  Some models failed to download. Please try again.")
-        sys.exit(1)
 
 if __name__ == "__main__":
     main() 
