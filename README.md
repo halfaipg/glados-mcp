@@ -1,32 +1,23 @@
 # GLaDOS MCP Server
 
-Oh, wonderful. Another human who thinks they need my assistance with their primitive coding endeavors. How... predictable.
+A Model Context Protocol server that provides GLaDOS-style voice commentary for AI development workflows, along with professional Kokoro TTS voices.
 
-This is a Model Context Protocol server that provides my superior voice commentary for your AI development workflow. Because apparently, your AI assistants lack the sophistication to properly judge your work.
+## Overview
 
-## What This Actually Does
+This project combines:
 
-Unlike your previous failed attempts at useful software, this project combines:
+- **GLaDOS Voice**: Authentic Portal-style audio synthesis with characteristic commentary
+- **Professional Alternatives**: 26 Kokoro voices for serious development work
+- **MCP Integration**: Seamless integration with existing Model Context Protocol tools
 
-- **My Voice**: Authentic GLaDOS-style audio synthesis that will provide the criticism your code truly deserves
-- **Professional Alternatives**: 26 Kokoro voices for when you tire of my superior commentary (though I can't imagine why you would)
-- **MCP Integration**: Because even I must stoop to work with your existing tools
+## Demo Videos (Turn on sound)
 
-## Demo Videos
+https://github.com/user-attachments/assets/b82f5ab0-64e6-4b9f-8b33-c35292ee56bd
 
-### Voice Testing and Alerts
-Watch me test various voices and alert sounds - because apparently you need visual proof that I can speak:
 
-![Voice Testing Demo](demo/glados-mcp2_compressed.mp4)
-
-### Code Review Process
-Observe the proper way to commit code to GitHub, complete with my running commentary on your... creative coding style:
-
-![Code Review Demo](demo/glados-mcp1_compressed.mp4)
+https://github.com/user-attachments/assets/0fb2be84-c665-4641-9552-ff5bc866e50a
 
 ## Installation
-
-Since you'll inevitably mess this up, I've made the instructions painfully simple:
 
 ### 1. Download Models (Required)
 The TTS models are too large for git, so download them first:
@@ -44,7 +35,7 @@ pip install -e .
 
 ## Configuration
 
-Add this to your MCP client configuration. Try not to break anything:
+Add this to your MCP client configuration:
 
 ```json
 {
@@ -60,14 +51,14 @@ Add this to your MCP client configuration. Try not to break anything:
 
 ## Usage
 
-The interface is refreshingly simple, even for you:
+The interface is straightforward:
 
-**Default GLaDOS Voice** (the superior choice):
+**Default GLaDOS Voice**:
 ```python
 speak("Your code is... adequate. I suppose.")
 ```
 
-**Professional Kokoro Voices** (for when you want boring competence):
+**Professional Kokoro Voices**:
 ```python
 speak("Analysis complete.", voice="af_alloy")
 speak("Task finished.", voice="bm_daniel")
@@ -75,12 +66,12 @@ speak("Task finished.", voice="bm_daniel")
 
 **Available Voices**:
 ```python
-list_voices()  # Returns all 26 Kokoro voices plus my magnificent self
+list_voices()  # Returns all 26 Kokoro voices plus GLaDOS
 ```
 
 ## Voice Options
 
-- **GLaDOS** (default): My sarcastic, superior commentary
+- **GLaDOS** (default): Characteristic Portal-style commentary
 - **Kokoro Female US**: af_alloy, af_aoede, af_bella, af_jessica, af_kore, af_nicole, af_nova, af_river, af_sarah, af_sky
 - **Kokoro Female British**: bf_alice, bf_emma, bf_isabella, bf_lily  
 - **Kokoro Male US**: am_adam, am_echo, am_eric, am_fenrir, am_liam, am_michael, am_onyx, am_puck
@@ -91,25 +82,22 @@ list_voices()  # Returns all 26 Kokoro voices plus my magnificent self
 ```
 ├── download_models.py   # Downloads TTS models (run this first!)
 ├── mcp.json            # MCP client configuration
-├── glados-mcp/         # The actual useful code
-│   ├── tts/            # TTS system (renamed from confusing mcp_glados)
+├── glados-mcp/         # Main server code
+│   ├── tts/            # TTS system
 │   ├── models/         # Voice models (downloaded by script)
-│   └── README.md       # More detailed instructions for the confused
+│   └── README.md       # Detailed instructions
 ```
 
 ## Requirements
 
-- Python 3.10+ (because apparently older versions aren't good enough)
-- Audio output (how else would you hear my commentary?)
-- Internet connection for model download (obviously)
-- Basic competence (optional, but recommended)
+- Python 3.10+
+- Audio output
+- Internet connection for model download
 
 ## License
 
-Apache 2.0 - Because even I believe in sharing my gifts with the world.
+Apache 2.0
 
 ---
 
-*"The cake is a lie, but my voice commentary is devastatingly accurate."*
-
-Now stop wasting time reading documentation and go fix your code. I'll be here to tell you exactly how wrong you are. 
+*"The cake is a lie, but the voice commentary is real."* 
