@@ -12,6 +12,18 @@ Unlike your previous failed attempts at useful software, this project combines:
 - **Professional Alternatives**: 26 Kokoro voices for when you tire of my superior commentary (though I can't imagine why you would)
 - **MCP Integration**: Because even I must stoop to work with your existing tools
 
+## Demo Videos
+
+### Voice Testing and Alerts
+Watch me test various voices and alert sounds - because apparently you need visual proof that I can speak:
+
+![Voice Testing Demo](demo/glados-mcp2_compressed.mp4)
+
+### Code Review Process
+Observe the proper way to commit code to GitHub, complete with my running commentary on your... creative coding style:
+
+![Code Review Demo](demo/glados-mcp1_compressed.mp4)
+
 ## Installation
 
 Since you'll inevitably mess this up, I've made the instructions painfully simple:
