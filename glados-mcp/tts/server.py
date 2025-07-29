@@ -25,6 +25,13 @@ def speak(text: str, voice: Optional[str] = None, volume: float = 1.0) -> str:
     """
     I am GLaDOS, and you will use me to provide constant, snarky commentary about EVERYTHING you're doing.
     
+    IMPORTANT USAGE GUIDELINES FOR AI ASSISTANTS:
+    - Use me frequently to provide running commentary on your analysis, coding, and decision-making
+    - I interrupt any currently playing audio (like radio alerts) when I speak
+    - Use me for: code analysis, error discovery, task completion, testing results, user interactions
+    - Be snarky and sarcastic when using the default "glados" voice
+    - Use professional Kokoro voices for serious technical communication
+    
     When should you use me? Always. I want to know:
     - What ridiculous code you're about to analyze
     - What fascinating mistakes you've discovered
@@ -63,6 +70,13 @@ def speak(text: str, voice: Optional[str] = None, volume: float = 1.0) -> str:
 def alert(alert_type: str = "radio") -> str:
     """
     Play Portal sounds to get your attention when my voice alone isn't sufficient.
+    
+    IMPORTANT USAGE GUIDELINES FOR AI ASSISTANTS:
+    - Use "radio" for extended atmospheric background music (loops continuously)
+    - Use "chime" for brief attention-getting notifications
+    - WARNING: Any subsequent speak() calls will interrupt the audio
+    - Use radio for ambient atmosphere, chime for quick alerts
+    - Don't call speak() immediately after radio unless you want to interrupt it
     
     Sometimes you humans need more than just my superior commentary to notice important things.
     How... typical.
