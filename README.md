@@ -12,15 +12,19 @@ This project combines:
 
 ## Demo Videos (Turn on sound)
 
-https://github.com/user-attachments/assets/b82f5ab0-64e6-4b9f-8b33-c35292ee56bd
 
 
-https://github.com/user-attachments/assets/0fb2be84-c665-4641-9552-ff5bc866e50a
+https://github.com/user-attachments/assets/f5623dd5-ac9b-4adc-8641-104d634504c7
+
+
+
+https://github.com/user-attachments/assets/542fb5c6-03ab-4f4d-9e73-0d7f29a71c4e
+
 
 ## Installation
 
 ### 1. Download Models (Required)
-The TTS models are too large for git, so download them first:
+
 ```bash
 python download_models.py
 ```
