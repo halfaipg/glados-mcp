@@ -25,7 +25,25 @@ The TTS models are too large for git, so download them first:
 python download_models.py
 ```
 
-### 2. Install the Server
+### 2. Install System Dependencies
+
+**Linux (Ubuntu/Debian):**
+```bash
+sudo apt update
+sudo apt install portaudio19-dev python3-pyaudio
+```
+
+**Linux (Fedora/RHEL):**
+```bash
+sudo dnf install portaudio-devel python3-pyaudio
+```
+
+**macOS:**
+```bash
+brew install portaudio
+```
+
+### 3. Install the Server
 ```bash
 cd glados-mcp
 python -m venv venv
@@ -93,6 +111,7 @@ list_voices()  # Returns all 26 Kokoro voices plus GLaDOS
 - Python 3.10+
 - Audio output
 - Internet connection for model download
+- **Linux**: PortAudio system library (`portaudio19-dev`)
 
 ## License
 
