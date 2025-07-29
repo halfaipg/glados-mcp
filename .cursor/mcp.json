@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "glados-mcp": {
+      "command": "./glados-mcp/venv/bin/python",
+      "args": ["-m", "tts.server"],
+      "cwd": "./glados-mcp",
+      "env": {
+        "PYTHONPATH": "./glados-mcp",
+        "MCP_DEBUG": "1",
+        "MCP_LOG_LEVEL": "DEBUG"
+      }
+    }
+  }
+} 
