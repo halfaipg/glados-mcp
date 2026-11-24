@@ -14,6 +14,7 @@ from numpy.typing import NDArray
 
 from ..utils.resources import data_path
 from ..utils.resources import model_path as _model_path
+from . import pronunciations
 
 # Default OnnxRuntime is way to verbose, only show fatal errors
 ort.set_default_logger_severity(4)
@@ -167,6 +168,7 @@ class Phonemizer:
         self.phoneme_dict: dict[str, str] = self._load_pickle(self.config.PHONEME_DICT_PATH)
 
         self.phoneme_dict["glados"] = "ɡlˈɑːdɑːs"  # Add GLaDOS to the phoneme dictionary!
+        self.phoneme_dict.update(pronunciations.extra_entries())  # days, months, tech terms, initialisms
 
         self.token_to_idx = self._load_pickle(self.config.TOKEN_TO_IDX_PATH)
         self.idx_to_token = self._load_pickle(self.config.IDX_TO_TOKEN_PATH)
@@ -539,7 +541,7 @@ class Phonemizer:
         # Step 2: Collect dictionary phonemes for words and hyphenated words
         for punct in punc_set:
             self.phoneme_dict[punct] = punct
-        word_phonemes = {word: self.phoneme_dict.get(word.lower()) for word in cleaned_words}
+        word_phonemes = {word: pronunciations.lookup(word, self.phoneme_dict) for word in cleaned_words}
 
         # Step 3: If word is not in dictionary, split it into subwords
         words_to_split = [w for w in cleaned_words if word_phonemes[w] is None]

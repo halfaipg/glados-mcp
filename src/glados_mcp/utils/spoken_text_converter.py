@@ -669,7 +669,7 @@ class SpokenTextConverter:
             Converts a matched word to its spoken form while preserving specific capitalization rules.
 
             This method handles word conversion with special considerations:
-            - Acronyms (all uppercase words with length > 1) are split into individual letters
+            - All-uppercase words keep their capitals so the phonemizer can spell out initialisms
             - The word "I" is preserved in its uppercase form
             - Other words are converted to lowercase
 
@@ -682,7 +682,7 @@ class SpokenTextConverter:
             word = match.group(0)
             # Keep uppercase if it's an acronym (all caps and length > 1)
             if word.isupper() and len(word) > 1:
-                return " ".join(word)  # Split into individual letters
+                return word  # The phonemizer decides whether to spell it out (API) or say it (NASA)
             # Special case: preserve "I" as uppercase
             if word == "I":
                 return word
