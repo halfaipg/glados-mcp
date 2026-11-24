@@ -1,6 +1,6 @@
 [project]
 name = "glados-mcp"
-version = "0.2.0"
+version = "0.2.1"
 description = "MCP server that speaks aloud as GLaDOS (or a neutral Kokoro voice) while your AI assistant works"
 readme = "README.md"
 requires-python = ">=3.10"

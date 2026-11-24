@@ -1,20 +1,30 @@
 # GLaDOS MCP Server
 
+[![PyPI](https://img.shields.io/pypi/v/glados-mcp)](https://pypi.org/project/glados-mcp/)
+[![Python versions](https://img.shields.io/pypi/pyversions/glados-mcp)](https://pypi.org/project/glados-mcp/)
+[![License: MIT](https://img.shields.io/pypi/l/glados-mcp)](LICENSE)
+[![MCP Registry](https://img.shields.io/badge/MCP%20Registry-io.github.halfaipg%2Fglados--mcp-blue)](https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.halfaipg/glados-mcp)
+[![Publish](https://github.com/halfaipg/glados-mcp/actions/workflows/publish.yml/badge.svg)](https://github.com/halfaipg/glados-mcp/actions/workflows/publish.yml)
+
 <!-- mcp-name: io.github.halfaipg/glados-mcp -->
 
-A Model Context Protocol server that lets your AI assistant talk to you out loud: GLaDOS-style commentary on whatever it is doing, or one of 26 neutral Kokoro voices when you want it to be serious.
+Your AI coding assistant, now with opinions about you. This Model Context Protocol server lets it talk out loud: GLaDOS-style commentary on whatever it is doing, or one of 26 neutral Kokoro voices when you want it to be serious.
 
 Speech is synthesized locally with ONNX models. Nothing you say or it says leaves your machine.
 
-## Demo Videos (Turn on sound)
+```bash
+uvx glados-mcp
+```
 
+## Demo
 
+Turn the sound on.
 
-https://github.com/user-attachments/assets/f5623dd5-ac9b-4adc-8641-104d634504c7
+https://github.com/user-attachments/assets/15be4927-439f-4697-b17f-991c6de69d80
 
+https://github.com/user-attachments/assets/f90c3673-f9d7-41f9-a643-6e5f0464545f
 
-
-https://github.com/user-attachments/assets/542fb5c6-03ab-4f4d-9e73-0d7f29a71c4e
+These are scripted scenes; the voice is real output from this server.
 
 ## Quick start
 

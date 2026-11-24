@@ -3,7 +3,7 @@
   "name": "io.github.halfaipg/glados-mcp",
   "title": "GLaDOS Voice",
   "description": "Local text-to-speech: your AI assistant speaks aloud as GLaDOS or one of 26 Kokoro voices.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "repository": {
     "url": "https://github.com/halfaipg/glados-mcp",
     "source": "github"
@@ -12,7 +12,7 @@
     {
       "registryType": "pypi",
       "identifier": "glados-mcp",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "runtimeHint": "uvx",
       "transport": {
         "type": "stdio"
