@@ -1,18 +1,17 @@
 from pathlib import Path
-from typing import Any
 
 import numpy as np
-from numpy.typing import NDArray
 import onnxruntime as ort  # type: ignore
+from numpy.typing import NDArray
 
-from ..utils.resources import resource_path
+from ..utils.resources import model_path
 from .phonemizer import Phonemizer
 
 # Default OnnxRuntime is way to verbose, only show fatal errors
 ort.set_default_logger_severity(4)
 
 
-VOICES_PATH = resource_path("kokoro-voices-v1.0.bin")
+VOICES_PATH = model_path("kokoro-voices-v1.0.bin")
 
 
 def get_voices(path: Path = VOICES_PATH) -> list[str]:
@@ -46,7 +45,7 @@ class SpeechSynthesizer:
         MAX_PHONEME_LENGTH: Maximum allowed phoneme sequence length
     """
 
-    MODEL_PATH: Path = resource_path("kokoro-v1.0.fp16.onnx")
+    MODEL_PATH: Path = model_path("kokoro-v1.0.fp16.onnx")
     DEFAULT_VOICE: str = "af_alloy"
     MAX_PHONEME_LENGTH: int = 510
     SAMPLE_RATE: int = 24000

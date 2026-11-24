@@ -1,15 +1,15 @@
+import json
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-import json
 from pathlib import Path
 from pickle import load
 from typing import Any
 
 import numpy as np
-from numpy.typing import NDArray
 import onnxruntime as ort  # type: ignore
+from numpy.typing import NDArray
 
-from ..utils.resources import resource_path
+from ..utils.resources import data_path, model_path
 from .phonemizer import Phonemizer
 
 # Default OnnxRuntime is way to verbose, only show fatal errors
@@ -112,8 +112,9 @@ class SpeechSynthesizer:
     MAX_WAV_VALUE = 32767.0
 
     # Settings
-    MODEL_PATH = resource_path("glados.onnx")
-    PHONEME_TO_ID_PATH = resource_path("phoneme_to_id.pkl")
+    MODEL_PATH = model_path("glados.onnx")
+    CONFIG_PATH = data_path("glados.json")
+    PHONEME_TO_ID_PATH = data_path("phoneme_to_id.pkl")
     USE_CUDA = True
 
     # Conversions
@@ -148,7 +149,7 @@ class SpeechSynthesizer:
 
         try:
             # Load the configuration file
-            config_file_path = model_path.with_suffix(".json")
+            config_file_path = self.CONFIG_PATH
             with open(config_file_path, encoding="utf-8") as config_file:
                 config_dict = json.load(config_file)
         except FileNotFoundError:

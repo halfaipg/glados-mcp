@@ -1,0 +1,84 @@
+name: Publish
+
+# Pushing a tag like v0.2.0 publishes that version to PyPI and then to the MCP Registry.
+# PyPI: uses trusted publishing (no token). One-time setup on pypi.org: add a
+#       trusted publisher for owner "halfaipg", repo "glados-mcp", workflow "publish.yml".
+# MCP Registry: authenticates with GitHub OIDC as io.github.halfaipg (no token).
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # OIDC for both PyPI trusted publishing and the MCP Registry
+      contents: read
+    env:
+      MCP_PUBLISHER_VERSION: v1.8.1
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Check that the tag matches pyproject.toml and server.json
+        run: |
+          set -euo pipefail
+          tag="${GITHUB_REF_NAME#v}"
+          project="$(uv version --short)"
+          server="$(jq -r .version server.json)"
+          package="$(jq -r '.packages[0].version' server.json)"
+          echo "tag=$tag pyproject=$project server.json=$server package=$package"
+          [ "$tag" = "$project" ] && [ "$tag" = "$server" ] && [ "$tag" = "$package" ]
+
+      - name: Run tests
+        run: |
+          sudo apt-get update && sudo apt-get install -y libportaudio2
+          uv run pytest -q
+
+      - name: Build
+        run: uv build
+
+      - name: Publish to PyPI
+        run: uv publish
+
+      - name: Wait for the release to appear on PyPI
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          for i in $(seq 1 30); do
+            curl --fail --silent --output /dev/null "https://pypi.org/pypi/glados-mcp/$version/json" && exit 0
+            sleep 10
+          done
+          echo "Release did not appear on PyPI" >&2
+          exit 1
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
+
+      - name: Download and verify mcp-publisher
+        run: |
+          set -euo pipefail
+          os="$(uname -s | tr '[:upper:]' '[:lower:]')"
+          arch="$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')"
+          archive="mcp-publisher_${os}_${arch}.tar.gz"
+          base_url="https://github.com/modelcontextprotocol/registry/releases/download/${MCP_PUBLISHER_VERSION}"
+
+          curl --fail --location --silent --show-error --output "$archive" "$base_url/$archive"
+          curl --fail --location --silent --show-error --output "$archive.sigstore.json" "$base_url/$archive.sigstore.json"
+          cosign verify-blob \
+            --bundle "$archive.sigstore.json" \
+            --certificate-identity "https://github.com/modelcontextprotocol/registry/.github/workflows/release.yml@refs/tags/${MCP_PUBLISHER_VERSION}" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+            "$archive"
+          tar xzf "$archive" mcp-publisher
+          rm -f "$archive" "$archive.sigstore.json"
+
+      - name: Authenticate to MCP Registry
+        run: ./mcp-publisher login github-oidc
+
+      - name: Publish server to MCP Registry
+        run: ./mcp-publisher publish

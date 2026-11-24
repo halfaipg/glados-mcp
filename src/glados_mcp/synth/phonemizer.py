@@ -1,18 +1,19 @@
 # ruff: noqa: RUF001
+import re
 from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import Enum
 from functools import cache
 from pathlib import Path
 from pickle import load
-import re
 from typing import Any
 
 import numpy as np
-from numpy.typing import NDArray
 import onnxruntime as ort  # type: ignore
+from numpy.typing import NDArray
 
-from ..utils.resources import resource_path
+from ..utils.resources import data_path
+from ..utils.resources import model_path as _model_path
 
 # Default OnnxRuntime is way to verbose, only show fatal errors
 ort.set_default_logger_severity(4)
@@ -37,15 +38,15 @@ class ModelConfig:
         idx_to_token_path: Path | None = None,
     ) -> None:
         # Provide default Path objects if None is passed or for defaults
-        self.MODEL_PATH = model_path if model_path is not None else resource_path("phomenizer_en.onnx")
+        self.MODEL_PATH = model_path if model_path is not None else _model_path("phomenizer_en.onnx")
         self.PHONEME_DICT_PATH = (
-            phoneme_dict_path if phoneme_dict_path is not None else resource_path("lang_phoneme_dict.pkl")
+            phoneme_dict_path if phoneme_dict_path is not None else data_path("lang_phoneme_dict.pkl")
         )
         self.TOKEN_TO_IDX_PATH = (
-            token_to_idx_path if token_to_idx_path is not None else resource_path("token_to_idx.pkl")
+            token_to_idx_path if token_to_idx_path is not None else data_path("token_to_idx.pkl")
         )
         self.IDX_TO_TOKEN_PATH = (
-            idx_to_token_path if idx_to_token_path is not None else resource_path("idx_to_token.pkl")
+            idx_to_token_path if idx_to_token_path is not None else data_path("idx_to_token.pkl")
         )
 
 

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.halfaipg/glados-mcp",
+  "title": "GLaDOS Voice",
+  "description": "Local text-to-speech: your AI assistant speaks aloud as GLaDOS or one of 26 Kokoro voices.",
+  "version": "0.2.0",
+  "repository": {
+    "url": "https://github.com/halfaipg/glados-mcp",
+    "source": "github"
+  },
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "glados-mcp",
+      "version": "0.2.0",
+      "runtimeHint": "uvx",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "GLADOS_MCP_DEFAULT_VOICE",
+          "description": "Voice used when a speak call does not name one: \"glados\" or a Kokoro voice such as \"af_alloy\".",
+          "isRequired": false,
+          "isSecret": false,
+          "format": "string",
+          "default": "glados"
+        },
+        {
+          "name": "GLADOS_MCP_MODELS_DIR",
+          "description": "Directory for the downloaded voice models (about 300 MB). Defaults to the per-user cache directory.",
+          "isRequired": false,
+          "isSecret": false,
+          "format": "filepath"
+        }
+      ]
+    }
+  ]
+}

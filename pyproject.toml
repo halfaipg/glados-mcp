@@ -1,0 +1,59 @@
+[project]
+name = "glados-mcp"
+version = "0.2.0"
+description = "MCP server that speaks aloud as GLaDOS (or a neutral Kokoro voice) while your AI assistant works"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "halfaipg" }]
+keywords = ["mcp", "tts", "text-to-speech", "glados", "kokoro", "voice"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Topic :: Multimedia :: Sound/Audio :: Speech",
+]
+dependencies = [
+    "anyio>=4.5",
+    "mcp>=2,<3",
+    "numpy>=1.26",
+    "onnxruntime>=1.16.0",
+    "sounddevice>=0.4.6",
+    "soundfile>=0.13.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/halfaipg/glados-mcp"
+Repository = "https://github.com/halfaipg/glados-mcp"
+Issues = "https://github.com/halfaipg/glados-mcp/issues"
+
+[project.scripts]
+glados-mcp = "glados_mcp.server:main"
+
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/glados_mcp"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src", "tests", "README.md", "LICENSE", "server.json"]
+
+[dependency-groups]
+dev = ["pytest>=8.3.3", "ruff>=0.6.9"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
